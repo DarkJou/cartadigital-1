@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <link rel="stylesheet" href="productos-1.css">
+</head>
+<body>
+    <header>
+        <h1>Productos</h1>
+    </header>
+    <main>
+        <section class="products-grid" id="product-list"></section>
+    </main>
+    <footer>
+        <a href="modificar-1.html">Modificar Productos</a>
+        <p>© 2024 Restobar</p>
+    </footer>
+    <script>
+        // Leer productos desde localStorage
+        const products = JSON.parse(localStorage.getItem("products")) || [];
+        const productList = document.getElementById("product-list");
+    
+        // Renderizar productos
+        function renderProducts() {
+            productList.innerHTML = ""; // Limpiar lista
+            products.forEach((product) => {
+                const div = document.createElement("div");
+                div.classList.add("product");
+                div.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.price}</p>
+                `;
+                productList.appendChild(div);
+            });
+        }
+    
+        // Inicializar
+        renderProducts();
+    </script>
+    
+</body>
+</html>
