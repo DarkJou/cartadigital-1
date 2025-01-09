@@ -43,6 +43,13 @@ button {
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
+button.modify-button {
+    background-color: rgb(255, 136, 0); /* Naranja */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 button:hover {
     background-color: #c9c9c9;

@@ -18,6 +18,8 @@ function renderProducts() {
             <img src="${product.img}" alt="${product.name}" width="50">
             <input type="text" value="${product.name}" data-index="${index}" data-field="name">
             <input type="text" value="${product.price}" data-index="${index}" data-field="price">
+            <input type="file" data-index="${index}" class="modify-img-input">
+            <button data-index="${index}" class="modify-button">Modificar</button>
             <button data-index="${index}" class="delete-button">Eliminar</button>
         `;
         productList.appendChild(li);
@@ -42,8 +44,43 @@ addButton.addEventListener("click", () => {
     const name = document.getElementById("add-name").value.trim();
     const price = document.getElementById("add-price").value.trim();
 
-    if (imgInput.files[0] && name && price) {
-        convertImageToBase64(imgInput.files[0], (base64Img) => {
+    if (!imgInput.files[0]) {
+        alert("Por favor, selecciona una imagen.");
+        return;
+    }
+
+    const file = imgInput.files[0];
+    const validImageTypes = [
+        "image/jpeg", 
+        "image/png", 
+        "image/gif", 
+        "image/webp", 
+        "image/jpg"
+    ];
+
+    // Diagnóstico: Verifica el tipo MIME
+    console.log("Tipo MIME del archivo:", file.type);
+
+    // Validar si el archivo es una imagen
+    if (!validImageTypes.includes(file.type)) {
+        alert("Solo se permiten imágenes en formato JPEG, PNG, GIF, WEBP o JPG.");
+        return;
+    }
+
+    const fileSizeInMB = file.size / 1024 / 1024; // Convertir a MB
+
+    // Diagnóstico: Verifica el tamaño del archivo
+    console.log("Tamaño del archivo:", fileSizeInMB, "MB");
+
+    // Validar tamaño de archivo (5 MB como límite)
+    if (fileSizeInMB > 5) {
+        alert("La imagen es demasiado grande. Elige un archivo de menos de 5 MB.");
+        return;
+    }
+
+    // Validar campos
+    if (name && price) {
+        convertImageToBase64(file, (base64Img) => {
             products.push({ img: base64Img, name, price });
             saveProducts(); // Guardar en localStorage
             renderProducts(); // Actualizar lista
@@ -56,13 +93,30 @@ addButton.addEventListener("click", () => {
 });
 
 // Modificar productos
-productList.addEventListener("input", (event) => {
-    const index = event.target.dataset.index;
-    const field = event.target.dataset.field;
+productList.addEventListener("click", (event) => {
+    if (event.target.classList.contains("modify-button")) {
+        const index = event.target.dataset.index;
+        const nameInput = document.querySelector(`input[data-index="${index}"][data-field="name"]`);
+        const priceInput = document.querySelector(`input[data-index="${index}"][data-field="price"]`);
+        const imgInput = document.querySelector(`input[data-index="${index}"].modify-img-input`);
 
-    if (index !== undefined && field) {
-        products[index][field] = event.target.value; // Actualizar producto
-        saveProducts(); // Guardar cambios
+        // Modificar nombre y precio
+        products[index].name = nameInput.value.trim();
+        products[index].price = priceInput.value.trim();
+
+        // Modificar imagen si se subió una nueva
+        if (imgInput.files[0]) {
+            convertImageToBase64(imgInput.files[0], (base64Img) => {
+                products[index].img = base64Img;
+                saveProducts(); // Guardar cambios
+                renderProducts(); // Actualizar lista
+                alert("Producto modificado correctamente.");
+            });
+        } else {
+            saveProducts(); // Guardar cambios
+            renderProducts(); // Actualizar lista
+            alert("Producto modificado correctamente.");
+        }
     }
 });
 
