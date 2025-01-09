@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos</title>
     <link rel="stylesheet" href="productos-1.css">
 </head>
+
 <body>
     <header>
         <h1>Productos-1</h1>
@@ -19,9 +21,40 @@
     </footer>
     <script>
         // Leer productos desde localStorage
-        const products = JSON.parse(localStorage.getItem("products")) || [];
-        const productList = document.getElementById("product-list");
-    
+        //const products = JSON.parse(localStorage.getItem("products")) || [];
+        //const productList = document.getElementById("product-list");
+        // Obtener productos desde la base de datos
+        function fetchProducts() {
+            fetch('https://cartavirtual.azurewebsites.net/api/productos')  // Usar la URL de tu aplicación en Azure
+                .then(response => response.json())
+                .then(data => {
+                    renderProducts(data);
+                })
+                .catch(error => {
+                    console.error('Error al obtener productos:', error);
+                });
+        }
+
+        // Agregar un producto
+        function addProduct(img, name, price) {
+            fetch('https://cartavirtual.azurewebsites.net/api/productos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ img, name, price })
+            })
+                .then(response => response.json())
+                .then(() => {
+                    alert('Producto agregado');
+                    fetchProducts(); // Recargar productos
+                })
+                .catch(error => {
+                    console.error('Error al agregar producto:', error);
+                });
+        }
+
+
         // Renderizar productos
         function renderProducts() {
             productList.innerHTML = ""; // Limpiar lista
@@ -36,10 +69,11 @@
                 productList.appendChild(div);
             });
         }
-    
+
         // Inicializar
         renderProducts();
     </script>
-    
+
 </body>
+
 </html>
